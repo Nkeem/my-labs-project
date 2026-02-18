@@ -28,22 +28,101 @@ public class CharacterService {
         }
     }
 
-
-    public void saveReversedToFile(String outputPath) {
+    public void saveToFile(String outputPath) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(outputPath))) {
 
             bw.write("id,name,status,species,gender\n");
 
-            while (!stack.isEmpty()) {
-                Character character = stack.pop();
-                bw.write(character.toCSV());
+            for (Character c : stack) {
+                bw.write(c.toCSV());
                 bw.newLine();
             }
 
-            System.out.println("Reversed file created.");
+            System.out.println("File saved.");
 
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+
+    // Create
+    public void create(Character character) {
+        stack.push(character);
+        System.out.println("Character added.");
+    }
+
+    // Read
+    public void readAll() {
+        for (Character c : stack) {
+            System.out.println(c.toCSV());
+        }
+    }
+
+    // Read by ID
+    public Character readById(int id) {
+        for (Character c : stack) {
+            if (c.getId() == id) {
+                return c;
+            }
+        }
+        return null;
+    }
+
+
+    //Update
+    public void update(int id, Character updatedCharacter) {
+
+        Stack<Character> tempStack = new Stack<>();
+        boolean found = false;
+
+        while (!stack.isEmpty()) {
+            Character current = stack.pop();
+
+            if (current.getId() == id) {
+
+                tempStack.push(updatedCharacter);
+                found = true;
+            } else {
+                tempStack.push(current);
+            }
+        }
+
+        while (!tempStack.isEmpty()) {
+            stack.push(tempStack.pop());
+        }
+
+        if (found) {
+            System.out.println("Character updated.");
+        } else {
+            System.out.println("Character not found.");
+        }
+    }
+
+    // Delete
+    public void delete(int id) {
+
+        Stack<Character> tempStack = new Stack<>();
+        boolean found = false;
+
+        while (!stack.isEmpty()) {
+            Character current = stack.pop();
+
+            if (current.getId() == id) {
+                found = true;
+            } else {
+                tempStack.push(current);
+            }
+        }
+
+        while (!tempStack.isEmpty()) {
+            stack.push(tempStack.pop());
+        }
+
+        if (found) {
+            System.out.println("Character deleted.");
+        } else {
+            System.out.println("Character not found.");
         }
     }
 }
