@@ -9,8 +9,6 @@ public class Main {
         CharacterService service = new CharacterService();
 
         service.loadFromFile("characters.csv");
-        //System.out.println(System.getProperty("user.dir"));
-        //service.saveToFile("reversed_characters.csv");
 
         service.delete(12);
 
