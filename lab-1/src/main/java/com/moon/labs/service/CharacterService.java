@@ -28,22 +28,28 @@ public class CharacterService {
         }
     }
 
-    public void saveToFile(String outputPath) {
+    public void saveReversedToFile(String outputPath) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(outputPath))) {
 
             bw.write("id,name,status,species,gender\n");
 
-            for (Character c : stack) {
-                bw.write(c.toCSV());
+            Stack<Character> tempStack = new Stack<>();
+
+            tempStack.addAll(stack);
+
+            while (!tempStack.isEmpty()) {
+                Character character = tempStack.pop();
+                bw.write(character.toCSV());
                 bw.newLine();
             }
 
-            System.out.println("File saved.");
+            System.out.println("Reversed file created.");
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
 
 
     // Create

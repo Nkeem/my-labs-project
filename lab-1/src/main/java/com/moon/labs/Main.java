@@ -20,7 +20,7 @@ public class Main {
 
         service.delete(12);
 
-        service.saveToFile("updated_characters.csv");
+        service.saveReversedToFile("updated_characters.csv");
 
 
 
