@@ -46,6 +46,7 @@ public class Department {
         this.budget = budget;
     }
 
+    // Правда здесь они не нужны
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -54,6 +55,7 @@ public class Department {
                 && Objects.equals(id, that.id)
                 && Objects.equals(name, that.name);
     }
+
 
     @Override
     public int hashCode() {
