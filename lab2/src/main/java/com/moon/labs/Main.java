@@ -72,5 +72,6 @@ public class Main {
         for (Department department : departments) {
             System.out.println(department);
         }
+        System.out.println("End this");
     }
 }
