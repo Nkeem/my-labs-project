@@ -3,8 +3,11 @@ package com.moon.labs;
 import com.moon.labs.config.ConnectionFactory;
 import com.moon.labs.config.DatabaseMigrator;
 import com.moon.labs.entity.Department;
+import com.moon.labs.exception.DepartmentNotFoundException;
 import com.moon.labs.repository.DepartmentRepository;
 import com.moon.labs.repository.DepartmentRepositoryImpl;
+import com.moon.labs.service.DepartmentService;
+import com.moon.labs.service.DepartmentServiceImpl;
 import org.jdbi.v3.core.Jdbi;
 
 import java.util.List;
@@ -18,49 +21,61 @@ public class Main {
 
         Jdbi jdbi = Jdbi.create(connectionFactory.getDataSource());
         DepartmentRepository repository = new DepartmentRepositoryImpl(jdbi);
+        DepartmentService service = new DepartmentServiceImpl(repository);
 
-        demoAllMethods(repository);
+        demoAllMethods(service);
 
         System.out.println("Завершение работы");
     }
 
-    private static void demoAllMethods(DepartmentRepository repository) {
+    private static void demoAllMethods(DepartmentService service) {
         System.out.println("=== Начальное состояние ===");
-        printDepartments(repository.findAll());
+        printDepartments(service.findAll());
 
-        Department department1 = new Department(0, "IT", 1_500_000.00);
-        Department department2 = new Department(0, "HR", 550_000.00);
-        Department department3 = new Department(0, "Finance", 2_300_000.00);
-
-        int savedId = repository.save(department1);
-        repository.save(department2);
-        repository.save(department3);
+        int savedId = service.save("IT", 1_500_000.00);
+        service.save("HR", 550_000.00);
+        service.save("Finance", 2_300_000.00);
 
         System.out.println("=== После сохранения ===");
-        printDepartments(repository.findAll());
+        printDepartments(service.findAll());
 
-        Department foundById = repository.findById(savedId);
+        Department foundById = service.findById(savedId);
         System.out.println("Найден по id: " + foundById);
 
-        Department foundByField = repository.findByField("IT");
+        Department foundByField = service.findByField("IT");
         System.out.println("Найден по name: " + foundByField);
 
-        if (foundById != null) {
-            foundById.setName("IT Department");
-            foundById.setBudget(1_750_000.00);
-            boolean updated = repository.update(foundById);
-            System.out.println("Обновлён: " + updated);
-        }
+        foundById.setName("IT Department");
+        foundById.setBudget(1_750_000.00);
+        service.update(foundById);
+        System.out.println("Обновлён");
 
         System.out.println("=== После обновления ===");
-        System.out.println("Найден по id: " + repository.findById(savedId));
+        System.out.println("Найден по id: " + service.findById(savedId));
 
-        repository.deleteById(savedId);
+        service.deleteById(savedId);
         System.out.println("Удалён с id = " + savedId);
 
         System.out.println("=== После удаления ===");
-        System.out.println("findById: " + repository.findById(savedId));
-        printDepartments(repository.findAll());
+        try {
+            System.out.println("findById: " + service.findById(savedId));
+        } catch (DepartmentNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
+
+        printDepartments(service.findAll());
+
+        try {
+            service.findById(999999);
+        } catch (DepartmentNotFoundException e) {
+            System.out.println("Ожидаемая ошибка findById: " + e.getMessage());
+        }
+
+        try {
+            service.deleteById(999999);
+        } catch (DepartmentNotFoundException e) {
+            System.out.println("Ожидаемая ошибка deleteById: " + e.getMessage());
+        }
     }
 
     private static void printDepartments(List<Department> departments) {
